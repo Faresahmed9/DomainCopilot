@@ -1,18 +1,14 @@
 ﻿using DomainCopilot.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DomainCopilot.Application.Interfaces
+namespace DomainCopilot.Application.Interfaces;
+
+public interface IClaimRepository
 {
-    public interface IClaimRepository
-    {
-        Task<Claim?> GetByIdAsync(Guid claimId);         // هاتلي الـ Claim اللي الـ ClaimId بتاعه كذا.
+    Task<Claim?> GetByIdAsync(
+        Guid claimId,
+        Guid tenantId);
 
-        Task<Claim?> GetByClaimNumberAsync(             // عشان نضمن إننا بنجيب الـ Claim الخاص بالـ Tenant الصحيح.     وده جزء مهم جدًا في الـ Security بتاع المشروع.
-            string claimNumber,
-            Guid tenantId);
-    }
+    Task<Claim?> GetByClaimNumberAsync(
+        string claimNumber,
+        Guid tenantId);
 }

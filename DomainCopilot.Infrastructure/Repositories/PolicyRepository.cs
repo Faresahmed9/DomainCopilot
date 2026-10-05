@@ -1,7 +1,7 @@
 ﻿using DomainCopilot.Application.Interfaces;
 using DomainCopilot.Domain;
-using Microsoft.EntityFrameworkCore;
 using DomainCopilot.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace DomainCopilot.Infrastructure.Repositories;
 
@@ -14,22 +14,28 @@ public class PolicyRepository : IPolicyRepository
         _context = context;
     }
 
-    public async Task<Policy?> GetByIdAsync(Guid policyId)
+    public async Task<Policy?> GetByIdAsync(
+        Guid policyId,
+        Guid tenantId)
     {
         return await _context.Policies
-            .FirstOrDefaultAsync(p => p.PolicyId == policyId);
+            .FirstOrDefaultAsync(x =>
+                x.PolicyId == policyId &&
+                x.TenantId == tenantId);
     }
-    // هيجيب الـ Version اللي كانت سارية وقت وقوع الحادث.
+
     public async Task<Policy?> GetActiveVersionAsync(
         string policyNumber,
-        DateTime incidentDate)
+        DateTime incidentDate,
+        Guid tenantId)
     {
         return await _context.Policies
-            .Where(p =>
-                p.PolicyNumber == policyNumber &&
-                p.EffectiveFrom <= incidentDate &&
-                p.EffectiveTo >= incidentDate)
-            .OrderByDescending(p => p.Version)
+            .Where(x =>
+                x.TenantId == tenantId &&
+                x.PolicyNumber == policyNumber &&
+                x.EffectiveFrom <= incidentDate &&
+                x.EffectiveTo >= incidentDate)
+            .OrderByDescending(x => x.Version)
             .FirstOrDefaultAsync();
     }
 }

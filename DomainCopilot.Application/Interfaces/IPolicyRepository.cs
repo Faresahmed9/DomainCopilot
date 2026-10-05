@@ -1,18 +1,15 @@
 ﻿using DomainCopilot.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DomainCopilot.Application.Interfaces
+namespace DomainCopilot.Application.Interfaces;
+
+public interface IPolicyRepository
 {
-    public interface IPolicyRepository
-    {
-        Task<Policy?> GetByIdAsync(Guid policyId);       // هاتلي Policy معينة باستخدام الـ ID بتاعها.
+    Task<Policy?> GetByIdAsync(
+        Guid policyId,
+        Guid tenantId);
 
-        Task<Policy?> GetActiveVersionAsync(          // هاتلي نسخة الـ Policy اللي كانت سارية وقت حدوث الحادث.
-            string policyNumber,
-            DateTime incidentDate);
-    }
+    Task<Policy?> GetActiveVersionAsync(
+        string policyNumber,
+        DateTime incidentDate,
+        Guid tenantId);
 }

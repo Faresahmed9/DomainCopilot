@@ -15,19 +15,39 @@ public class ApprovalRepository : IApprovalRepository
     }
 
     public async Task<ApprovalRequest?> GetByIdAsync(
-        Guid approvalRequestId)
+        Guid approvalRequestId,
+        Guid tenantId)
     {
-        return await _context.ApprovalRequests
-            .FirstOrDefaultAsync(a =>
-                a.ApprovalRequestId == approvalRequestId);
+        return await (
+            from approval in _context.ApprovalRequests
+            join decision in _context.AdjudicationDecisions
+                on approval.AdjudicationDecisionId
+                equals decision.AdjudicationDecisionId
+            join claim in _context.Claims
+                on decision.ClaimId
+                equals claim.ClaimId
+            where approval.ApprovalRequestId == approvalRequestId
+                  && claim.TenantId == tenantId
+            select approval
+        ).FirstOrDefaultAsync();
     }
 
     public async Task<ApprovalRequest?> GetByDecisionIdAsync(
-        Guid adjudicationDecisionId)
+        Guid adjudicationDecisionId,
+        Guid tenantId)
     {
-        return await _context.ApprovalRequests
-            .FirstOrDefaultAsync(a =>
-                a.AdjudicationDecisionId == adjudicationDecisionId);
+        return await (
+            from approval in _context.ApprovalRequests
+            join decision in _context.AdjudicationDecisions
+                on approval.AdjudicationDecisionId
+                equals decision.AdjudicationDecisionId
+            join claim in _context.Claims
+                on decision.ClaimId
+                equals claim.ClaimId
+            where approval.AdjudicationDecisionId == adjudicationDecisionId
+                  && claim.TenantId == tenantId
+            select approval
+        ).FirstOrDefaultAsync();
     }
 
     public async Task AddAsync(

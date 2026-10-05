@@ -2,7 +2,6 @@
 using DomainCopilot.Application.Services;
 using DomainCopilot.Domain.Enums;
 
-
 namespace DomainCopilot.Application.UseCases;
 
 public class AdjudicateClaimUseCase
@@ -25,10 +24,13 @@ public class AdjudicateClaimUseCase
     }
 
     public async Task<AdjudicationResultDto?> ExecuteAsync(
-        Guid claimId)
+        Guid claimId,
+        Guid tenantId)
     {
         var context = await _getClaimContextUseCase
-            .ExecuteAsync(claimId);
+            .ExecuteAsync(
+                claimId,
+                tenantId);
 
         if (context is null)
         {

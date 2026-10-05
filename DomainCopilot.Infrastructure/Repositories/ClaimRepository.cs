@@ -14,10 +14,14 @@ public class ClaimRepository : IClaimRepository
         _context = context;
     }
 
-    public async Task<Claim?> GetByIdAsync(Guid claimId)
+    public async Task<Claim?> GetByIdAsync(
+        Guid claimId,
+        Guid tenantId)
     {
         return await _context.Claims
-            .FirstOrDefaultAsync(c => c.ClaimId == claimId);
+            .FirstOrDefaultAsync(x =>
+                x.ClaimId == claimId &&
+                x.TenantId == tenantId);
     }
 
     public async Task<Claim?> GetByClaimNumberAsync(
@@ -25,8 +29,8 @@ public class ClaimRepository : IClaimRepository
         Guid tenantId)
     {
         return await _context.Claims
-            .FirstOrDefaultAsync(c =>
-                c.ClaimNumber == claimNumber &&
-                c.TenantId == tenantId);
+            .FirstOrDefaultAsync(x =>
+                x.ClaimNumber == claimNumber &&
+                x.TenantId == tenantId);
     }
 }
