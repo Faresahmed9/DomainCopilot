@@ -122,36 +122,35 @@ public class ApplicationDbContext : DbContext
             .IsUnique();
 
 
-
         modelBuilder.Entity<User>().HasData(
-    new User(
-        Guid.Parse("A1111111-1111-1111-1111-111111111111"),
-        Guid.Parse("A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2"),
-        "admin.a",
-        "Admin123!",
-        UserRole.Admin),
+     new User(
+         Guid.Parse("A1111111-1111-1111-1111-111111111111"),
+         Guid.Parse("A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2"),
+         "admin.a",
+         "AQAAAAIAAYagAAAAELsJ6ksJI8Ya9B5alBr/o2HFqsyheAnvLL7WMs9Z82deO3zpQ54h6/mUv9e9mbA35Q==",
+         UserRole.Admin),
 
-    new User(
-        Guid.Parse("A2222222-2222-2222-2222-222222222222"),
-        Guid.Parse("A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2"),
-        "adjuster.a",
-        "Adjuster123!",
-        UserRole.Adjuster),
+     new User(
+         Guid.Parse("A2222222-2222-2222-2222-222222222222"),
+         Guid.Parse("A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2"),
+         "adjuster.a",
+         "AQAAAAIAAYagAAAAEHcusyGKVyYXrprjsLRPoeOMa/9+/8LJrH6I9QWPR2bTc+YY1x7ZHqIhE8STc2ma1g==",
+         UserRole.Adjuster),
 
-    new User(
-        Guid.Parse("B1111111-1111-1111-1111-111111111111"),
-        Guid.Parse("22222222-2222-2222-2222-222222222222"),
-        "admin.b",
-        "Admin123!",
-        UserRole.Admin),
+     new User(
+         Guid.Parse("B1111111-1111-1111-1111-111111111111"),
+         Guid.Parse("22222222-2222-2222-2222-222222222222"),
+         "admin.b",
+         "AQAAAAIAAYagAAAAEAlp3qr3v3T35+pIUjeLIvhleN1Ai2oGcqoCie4CmPVbvfhJU5igvfba9t/QG1SDww==",
+         UserRole.Admin),
 
-    new User(
-        Guid.Parse("B2222222-2222-2222-2222-222222222222"),
-        Guid.Parse("22222222-2222-2222-2222-222222222222"),
-        "adjuster.b",
-        "Adjuster123!",
-        UserRole.Adjuster)
-);
+     new User(
+         Guid.Parse("B2222222-2222-2222-2222-222222222222"),
+         Guid.Parse("22222222-2222-2222-2222-222222222222"),
+         "adjuster.b",
+         "AQAAAAIAAYagAAAAEHX7i4q55MfTE9ZHdjJcVXfcSvE7FTYTuzRSFudZfRJ9H2LvQIusBbp5XwEFBn6L1g==",
+         UserRole.Adjuster)
+ );
     }
 
 

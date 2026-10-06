@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>77ff28f8-8c9f-41d7-8672-4a92b99d1569</UserSecretsId>
 		<UseAppHost>false</UseAppHost>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +15,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DomainCopilot.Application\DomainCopilot.Application.csproj" />
     <ProjectReference Include="..\DomainCopilot.Infrastructure\DomainCopilot.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Corpus\" />
   </ItemGroup>
 
 </Project>

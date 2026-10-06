@@ -407,6 +407,40 @@ namespace DomainCopilot.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("a1111111-1111-1111-1111-111111111111"),
+                            Password = "AQAAAAIAAYagAAAAELsJ6ksJI8Ya9B5alBr/o2HFqsyheAnvLL7WMs9Z82deO3zpQ54h6/mUv9e9mbA35Q==",
+                            Role = 0,
+                            TenantId = new Guid("a071edbd-a4c8-4c53-81bb-9cef1c72ecb2"),
+                            Username = "admin.a"
+                        },
+                        new
+                        {
+                            UserId = new Guid("a2222222-2222-2222-2222-222222222222"),
+                            Password = "AQAAAAIAAYagAAAAEHcusyGKVyYXrprjsLRPoeOMa/9+/8LJrH6I9QWPR2bTc+YY1x7ZHqIhE8STc2ma1g==",
+                            Role = 1,
+                            TenantId = new Guid("a071edbd-a4c8-4c53-81bb-9cef1c72ecb2"),
+                            Username = "adjuster.a"
+                        },
+                        new
+                        {
+                            UserId = new Guid("b1111111-1111-1111-1111-111111111111"),
+                            Password = "AQAAAAIAAYagAAAAEAlp3qr3v3T35+pIUjeLIvhleN1Ai2oGcqoCie4CmPVbvfhJU5igvfba9t/QG1SDww==",
+                            Role = 0,
+                            TenantId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Username = "admin.b"
+                        },
+                        new
+                        {
+                            UserId = new Guid("b2222222-2222-2222-2222-222222222222"),
+                            Password = "AQAAAAIAAYagAAAAEHX7i4q55MfTE9ZHdjJcVXfcSvE7FTYTuzRSFudZfRJ9H2LvQIusBbp5XwEFBn6L1g==",
+                            Role = 1,
+                            TenantId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Username = "adjuster.b"
+                        });
                 });
 
             modelBuilder.Entity("DomainCopilot.Domain.AdjudicationDecision", b =>

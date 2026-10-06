@@ -17,11 +17,25 @@ public static class InfrastructureServiceExtensions
     this IServiceCollection services)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(
-        "Server=DESKTOP-42I26G0;Database=DomainCopilotDb;Trusted_Connection=True;TrustServerCertificate=True;"));
+        {
+            var configuration =
+                services.BuildServiceProvider()
+                    .GetRequiredService<IConfiguration>();
+
+            var connectionString =
+                configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString =
+                    "Server=DESKTOP-42I26G0;Database=DomainCopilotDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            }
+
+            options.UseSqlServer(connectionString);
+        });
 
 
-    services.AddScoped<IPolicyRepository, PolicyRepository>();
+        services.AddScoped<IPolicyRepository, PolicyRepository>();
         services.AddScoped<IClaimRepository, ClaimRepository>();
         services.AddScoped<ICoverageRepository, CoverageRepository>();
         services.AddScoped<IExclusionRepository, ExclusionRepository>();
