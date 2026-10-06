@@ -30,6 +30,8 @@
     <ProjectReference Include="..\DomainCopilot.Application\DomainCopilot.Application.csproj" />
     <ProjectReference Include="..\DomainCopilot.Domain\DomainCopilot.Domain.csproj" />
     <ProjectReference Include="..\DomainCopilot.Infrastructure\DomainCopilot.Infrastructure.csproj" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
