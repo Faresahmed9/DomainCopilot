@@ -55,8 +55,10 @@ public class ClaimAdjudicationOrchestrator
     }
 
     public async Task<OrchestrationResultDto?> ExecuteAsync(
-        Guid claimId,
-        Guid tenantId)
+    Guid claimId,
+    Guid tenantId,
+    CancellationToken cancellationToken = default,
+    IProgress<string>? progress = null)
     {
         // 1. Get claim and the correct policy version
         var context = await _getClaimContextUseCase
@@ -66,6 +68,7 @@ public class ClaimAdjudicationOrchestrator
 
         if (context is null)
             return null;
+        progress?.Report("Claim context loaded.");
 
         // 2. Retrieve relevant policy evidence using RAG
         var retrievalResults =
@@ -74,6 +77,7 @@ public class ClaimAdjudicationOrchestrator
                 context.Policy.PolicyNumber,
                 context.Claim.IncidentDate,
                 context.Claim.Description);
+        progress?.Report("Policy evidence retrieved.");
 
         var policyEvidence = string.Join(
             "\n\n",
@@ -115,7 +119,7 @@ public class ClaimAdjudicationOrchestrator
                 coverageAnalysis,
                 exclusionAnalysis,
                 policyEvidence);
-
+        progress?.Report("AI analysis completed.");
         // 8. Deterministic financial calculation
         decimal approvedAmount = 0;
         DecisionStatus decision;
@@ -176,6 +180,7 @@ public class ClaimAdjudicationOrchestrator
             approvalRequest);
 
         // 13. Return the complete recommendation
+        progress?.Report("Adjudication decision created and approval request is pending.");
         return new OrchestrationResultDto
         {
             ClaimId = context.Claim.ClaimId,

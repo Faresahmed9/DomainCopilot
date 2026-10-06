@@ -60,13 +60,17 @@ public class ClaimsController : ControllerBase
         return Ok(result);
     }
 
+
     [HttpPost("{claimId:guid}/orchestrate")]
-    public async Task<IActionResult> Orchestrate(Guid claimId)
+    public async Task<IActionResult> Orchestrate(
+      Guid claimId,
+      CancellationToken cancellationToken)
     {
         var result = await _claimAdjudicationOrchestrator
             .ExecuteAsync(
                 claimId,
-                _tenantContext.TenantId);
+                _tenantContext.TenantId,
+                cancellationToken);
 
         if (result is null)
         {
@@ -74,5 +78,41 @@ public class ClaimsController : ControllerBase
         }
 
         return Ok(result);
+    }
+    [HttpPost("{claimId:guid}/orchestrate/stream")]
+    public async Task StreamOrchestration(
+        Guid claimId,
+        CancellationToken cancellationToken)
+    {
+        Response.ContentType = "text/event-stream";
+
+        try
+        {
+            await Response.WriteAsync(
+                "data: orchestration-started\n\n",
+                cancellationToken);
+
+            var progress = new Progress<string>(message =>
+            {
+                _ = Response.WriteAsync(
+                    $"data: {message}\n\n",
+                    cancellationToken);
+            });
+
+            var result =
+                await _claimAdjudicationOrchestrator.ExecuteAsync(
+                    claimId,
+                    _tenantContext.TenantId,
+                    cancellationToken,
+                    progress);
+
+            await Response.WriteAsync(
+                "data: completed\n\n",
+                cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Client cancelled the request.
+        }
     }
 }
