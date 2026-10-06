@@ -38,6 +38,10 @@ public class ProcessDocumentUseCase
         if (document is null)
             return null;
 
+        await _documentChunkRepository.DeleteByDocumentIdAsync(
+        documentId,
+        tenantId);
+
         await using var fileStream =
             await _documentStorage.OpenReadAsync(
                 document.StoragePath);

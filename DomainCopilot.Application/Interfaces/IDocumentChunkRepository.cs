@@ -9,6 +9,10 @@ public interface IDocumentChunkRepository
     Task<IReadOnlyList<DocumentChunk>> GetByDocumentIdAsync(
         Guid documentId);
 
+    Task DeleteByDocumentIdAsync(
+        Guid documentId,
+        Guid tenantId);
+
     Task<IReadOnlyList<DocumentChunk>> SearchAsync(
         Guid tenantId,
         string policyNumber,

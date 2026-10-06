@@ -30,6 +30,24 @@ public class DocumentChunkRepository : IDocumentChunkRepository
             .ToListAsync();
     }
 
+    public async Task DeleteByDocumentIdAsync(
+    Guid documentId,
+    Guid tenantId)
+    {
+        var chunks = await _context.DocumentChunks
+            .Where(x =>
+                x.DocumentId == documentId &&
+                x.TenantId == tenantId)
+            .ToListAsync();
+
+        if (chunks.Count == 0)
+            return;
+
+        _context.DocumentChunks.RemoveRange(chunks);
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<IReadOnlyList<DocumentChunk>> SearchAsync(
         Guid tenantId,
         string policyNumber,

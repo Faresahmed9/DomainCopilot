@@ -24,6 +24,11 @@ public class TextCleaner : ITextCleaner
             @"\n{3,}",
             "\n\n");
 
+        cleanedText = Regex.Replace(
+        cleanedText,
+         @"file:///C\|/.*?(?=\[|$)",
+          "");
+
         return cleanedText.Trim();
     }
 }
