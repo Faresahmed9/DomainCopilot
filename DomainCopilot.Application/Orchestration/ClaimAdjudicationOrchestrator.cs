@@ -1,17 +1,18 @@
-﻿using DomainCopilot.Application.Agents;
+﻿
+using DomainCopilot.Application.Agents;
 using DomainCopilot.Application.DTOs;
 using DomainCopilot.Application.Interfaces;
 using DomainCopilot.Application.Services;
-using DomainCopilot.Application.UseCases;
+using DomainCopilot.Application.Tools;
 using DomainCopilot.Domain;
 using DomainCopilot.Domain.Enums;
-using DomainCopilot.Application.Tools;
+using Microsoft.Extensions.Logging;
 
 namespace DomainCopilot.Application.Orchestration;
 
 public class ClaimAdjudicationOrchestrator
 {
-   
+    private readonly ClaimContextTool _claimContextTool;
     private readonly PolicyRetrievalTool _policyRetrievalTool;
 
     private readonly CoverageMatcherAgent _coverageMatcherAgent;
@@ -20,33 +21,30 @@ public class ClaimAdjudicationOrchestrator
 
     private readonly CoverageEvaluator _coverageEvaluator;
     private readonly ExclusionEvaluator _exclusionEvaluator;
-   
-   
-
-    private readonly IAdjudicationRepository _adjudicationRepository;
-    private readonly IApprovalRepository _approvalRepository;
-    private readonly ClaimContextTool _claimContextTool;
     private readonly ClaimAmountCalculatorTool _claimAmountCalculatorTool;
     private readonly AnomalyDetectionTool _anomalyDetectionTool;
 
+    private readonly IAdjudicationRepository _adjudicationRepository;
+    private readonly IApprovalRepository _approvalRepository;
+
+    private readonly ILogger<ClaimAdjudicationOrchestrator> _logger;
+
     public ClaimAdjudicationOrchestrator(
-        
+        ClaimContextTool claimContextTool,
         PolicyRetrievalTool policyRetrievalTool,
         CoverageMatcherAgent coverageMatcherAgent,
         ExclusionAnalystAgent exclusionAnalystAgent,
         AdjudicationDrafterAgent adjudicationDrafterAgent,
         CoverageEvaluator coverageEvaluator,
         ExclusionEvaluator exclusionEvaluator,
-        
-        
+        ClaimAmountCalculatorTool claimAmountCalculatorTool,
+        AnomalyDetectionTool anomalyDetectionTool,
         IAdjudicationRepository adjudicationRepository,
         IApprovalRepository approvalRepository,
-        ClaimContextTool claimContextTool,
-        ClaimAmountCalculatorTool claimAmountCalculatorTool,
-        AnomalyDetectionTool anomalyDetectionTool)
+        ILogger<ClaimAdjudicationOrchestrator> logger)
     {
-        
-        _policyRetrievalTool = policyRetrievalTool; 
+        _claimContextTool = claimContextTool;
+        _policyRetrievalTool = policyRetrievalTool;
 
         _coverageMatcherAgent = coverageMatcherAgent;
         _exclusionAnalystAgent = exclusionAnalystAgent;
@@ -54,40 +52,63 @@ public class ClaimAdjudicationOrchestrator
 
         _coverageEvaluator = coverageEvaluator;
         _exclusionEvaluator = exclusionEvaluator;
-        
-       
+        _claimAmountCalculatorTool = claimAmountCalculatorTool;
+        _anomalyDetectionTool = anomalyDetectionTool;
 
         _adjudicationRepository = adjudicationRepository;
         _approvalRepository = approvalRepository;
-        _claimContextTool = claimContextTool;
-        _claimAmountCalculatorTool = claimAmountCalculatorTool;
-        _anomalyDetectionTool = anomalyDetectionTool;
+
+        _logger = logger;
     }
 
     public async Task<OrchestrationResultDto?> ExecuteAsync(
-    Guid claimId,
-    Guid tenantId,
-    CancellationToken cancellationToken = default,
-    IProgress<string>? progress = null)
+        Guid claimId,
+        Guid tenantId,
+        CancellationToken cancellationToken = default,
+        IProgress<string>? progress = null)
     {
+        _logger.LogInformation(
+            "Starting claim adjudication orchestration. ClaimId: {ClaimId}, TenantId: {TenantId}",
+            claimId,
+            tenantId);
+
+        progress?.Report("Loading claim context.");
+
         // 1. Get claim and the correct policy version
         var context = await _claimContextTool
-    .ExecuteAsync(
-        claimId,
-        tenantId);
+            .ExecuteAsync(
+                claimId,
+                tenantId);
 
         if (context is null)
             return null;
+
+        _logger.LogInformation(
+            "Claim context loaded. ClaimId: {ClaimId}, PolicyNumber: {PolicyNumber}, PolicyVersion: {PolicyVersion}",
+            claimId,
+            context.Policy.PolicyNumber,
+            context.Policy.Version);
+
         progress?.Report("Claim context loaded.");
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         // 2. Retrieve relevant policy evidence using RAG
         var retrievalResults =
-     await _policyRetrievalTool.ExecuteAsync(
-         tenantId,
-         context.Policy.PolicyNumber,
-         context.Claim.IncidentDate,
-         context.Claim.Description);
+            await _policyRetrievalTool.ExecuteAsync(
+                tenantId,
+                context.Policy.PolicyNumber,
+                context.Claim.IncidentDate,
+                context.Claim.Description);
+
+        _logger.LogInformation(
+            "Policy retrieval completed. ClaimId: {ClaimId}, RetrievedChunks: {Count}",
+            claimId,
+            retrievalResults.Count);
+
         progress?.Report("Policy evidence retrieved.");
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         var policyEvidence = string.Join(
             "\n\n",
@@ -109,17 +130,35 @@ public class ClaimAdjudicationOrchestrator
                 context.Claim,
                 context.Exclusions);
 
+        _logger.LogInformation(
+            "Deterministic policy evaluation completed. ClaimId: {ClaimId}, HasCoverage: {HasCoverage}, HasExclusion: {HasExclusion}",
+            claimId,
+            matchingCoverage is not null,
+            matchingExclusion is not null);
+
+        progress?.Report("Policy coverage and exclusions evaluated.");
+
+        cancellationToken.ThrowIfCancellationRequested();
+
         // 5. Coverage Matcher Agent
+        _logger.LogInformation(
+            "Starting specialist agent analysis. ClaimId: {ClaimId}",
+            claimId);
+
         var coverageAnalysis =
             await _coverageMatcherAgent.MatchAsync(
                 context.Claim.Description,
                 policyEvidence);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         // 6. Exclusion Analyst Agent
         var exclusionAnalysis =
             await _exclusionAnalystAgent.AnalyzeAsync(
                 context.Claim.Description,
                 policyEvidence);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         // 7. Adjudication Drafter Agent
         var adjudicationDraft =
@@ -129,7 +168,15 @@ public class ClaimAdjudicationOrchestrator
                 coverageAnalysis,
                 exclusionAnalysis,
                 policyEvidence);
+
+        _logger.LogInformation(
+            "Specialist agent analysis completed. ClaimId: {ClaimId}",
+            claimId);
+
         progress?.Report("AI analysis completed.");
+
+        cancellationToken.ThrowIfCancellationRequested();
+
         // 8. Deterministic financial calculation
         decimal approvedAmount = 0;
         DecisionStatus decision;
@@ -145,10 +192,10 @@ public class ClaimAdjudicationOrchestrator
         else
         {
             approvedAmount =
-    _claimAmountCalculatorTool.Execute(
-        context.Claim.ClaimedAmount,
-        matchingCoverage.Limit,
-        matchingCoverage.Deductible);
+                _claimAmountCalculatorTool.Execute(
+                    context.Claim.ClaimedAmount,
+                    matchingCoverage.Limit,
+                    matchingCoverage.Deductible);
 
             decision =
                 approvedAmount == context.Claim.ClaimedAmount
@@ -156,11 +203,25 @@ public class ClaimAdjudicationOrchestrator
                     : DecisionStatus.PartiallyApproved;
         }
 
+        _logger.LogInformation(
+            "Deterministic adjudication completed. ClaimId: {ClaimId}, Decision: {Decision}, ApprovedAmount: {ApprovedAmount}",
+            claimId,
+            decision,
+            approvedAmount);
+
+        progress?.Report("Deterministic financial calculation completed.");
+
+        cancellationToken.ThrowIfCancellationRequested();
+
         // 9. Detect anomalies
         var anomalies =
-    _anomalyDetectionTool.Execute(
-        context.Claim,
-        matchingCoverage);
+            _anomalyDetectionTool.Execute(
+                context.Claim,
+                matchingCoverage);
+
+        progress?.Report("Anomaly detection completed.");
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         // 10. Build decision reason
         var reason =
@@ -181,6 +242,10 @@ public class ClaimAdjudicationOrchestrator
         await _adjudicationRepository.AddAsync(
             adjudicationDecision);
 
+        progress?.Report("Adjudication decision created.");
+
+        cancellationToken.ThrowIfCancellationRequested();
+
         // 12. Create Human Approval Request
         var approvalRequest =
             new ApprovalRequest(
@@ -189,8 +254,22 @@ public class ClaimAdjudicationOrchestrator
         await _approvalRepository.AddAsync(
             approvalRequest);
 
+        _logger.LogInformation(
+            "Human approval request created. ClaimId: {ClaimId}, ApprovalRequestId: {ApprovalRequestId}",
+            claimId,
+            approvalRequest.ApprovalRequestId);
+
+        progress?.Report(
+            "Human approval request created and is pending.");
+
+        _logger.LogInformation(
+            "Claim adjudication orchestration completed. ClaimId: {ClaimId}",
+            claimId);
+
+        progress?.Report(
+            "Adjudication orchestration completed.");
+
         // 13. Return the complete recommendation
-        progress?.Report("Adjudication decision created and approval request is pending.");
         return new OrchestrationResultDto
         {
             ClaimId = context.Claim.ClaimId,
@@ -219,3 +298,4 @@ public class ClaimAdjudicationOrchestrator
         };
     }
 }
+
