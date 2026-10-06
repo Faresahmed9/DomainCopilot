@@ -58,6 +58,16 @@ public static class InfrastructureServiceExtensions
             var configuration =
                 sp.GetRequiredService<IConfiguration>();
 
+            var provider =
+                configuration["AI:Provider"] ?? "Gemini";
+
+            if (provider.Equals(
+                "Local",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return new LocalAiProvider();
+            }
+
             var apiKey = configuration["Gemini:ApiKey"];
 
             if (string.IsNullOrWhiteSpace(apiKey))

@@ -5,13 +5,14 @@ using DomainCopilot.Application.Services;
 using DomainCopilot.Application.UseCases;
 using DomainCopilot.Domain;
 using DomainCopilot.Domain.Enums;
+using DomainCopilot.Application.Tools;
 
 namespace DomainCopilot.Application.Orchestration;
 
 public class ClaimAdjudicationOrchestrator
 {
-    private readonly GetClaimContextUseCase _getClaimContextUseCase;
-    private readonly RetrieveRelevantChunksUseCase _retrieveRelevantChunksUseCase;
+   
+    private readonly PolicyRetrievalTool _policyRetrievalTool;
 
     private readonly CoverageMatcherAgent _coverageMatcherAgent;
     private readonly ExclusionAnalystAgent _exclusionAnalystAgent;
@@ -19,27 +20,33 @@ public class ClaimAdjudicationOrchestrator
 
     private readonly CoverageEvaluator _coverageEvaluator;
     private readonly ExclusionEvaluator _exclusionEvaluator;
-    private readonly ClaimAmountCalculator _claimAmountCalculator;
-    private readonly AnomalyDetector _anomalyDetector;
+   
+   
 
     private readonly IAdjudicationRepository _adjudicationRepository;
     private readonly IApprovalRepository _approvalRepository;
+    private readonly ClaimContextTool _claimContextTool;
+    private readonly ClaimAmountCalculatorTool _claimAmountCalculatorTool;
+    private readonly AnomalyDetectionTool _anomalyDetectionTool;
 
     public ClaimAdjudicationOrchestrator(
-        GetClaimContextUseCase getClaimContextUseCase,
-        RetrieveRelevantChunksUseCase retrieveRelevantChunksUseCase,
+        
+        PolicyRetrievalTool policyRetrievalTool,
         CoverageMatcherAgent coverageMatcherAgent,
         ExclusionAnalystAgent exclusionAnalystAgent,
         AdjudicationDrafterAgent adjudicationDrafterAgent,
         CoverageEvaluator coverageEvaluator,
         ExclusionEvaluator exclusionEvaluator,
-        ClaimAmountCalculator claimAmountCalculator,
-        AnomalyDetector anomalyDetector,
+        
+        
         IAdjudicationRepository adjudicationRepository,
-        IApprovalRepository approvalRepository)
+        IApprovalRepository approvalRepository,
+        ClaimContextTool claimContextTool,
+        ClaimAmountCalculatorTool claimAmountCalculatorTool,
+        AnomalyDetectionTool anomalyDetectionTool)
     {
-        _getClaimContextUseCase = getClaimContextUseCase;
-        _retrieveRelevantChunksUseCase = retrieveRelevantChunksUseCase;
+        
+        _policyRetrievalTool = policyRetrievalTool; 
 
         _coverageMatcherAgent = coverageMatcherAgent;
         _exclusionAnalystAgent = exclusionAnalystAgent;
@@ -47,11 +54,14 @@ public class ClaimAdjudicationOrchestrator
 
         _coverageEvaluator = coverageEvaluator;
         _exclusionEvaluator = exclusionEvaluator;
-        _claimAmountCalculator = claimAmountCalculator;
-        _anomalyDetector = anomalyDetector;
+        
+       
 
         _adjudicationRepository = adjudicationRepository;
         _approvalRepository = approvalRepository;
+        _claimContextTool = claimContextTool;
+        _claimAmountCalculatorTool = claimAmountCalculatorTool;
+        _anomalyDetectionTool = anomalyDetectionTool;
     }
 
     public async Task<OrchestrationResultDto?> ExecuteAsync(
@@ -61,10 +71,10 @@ public class ClaimAdjudicationOrchestrator
     IProgress<string>? progress = null)
     {
         // 1. Get claim and the correct policy version
-        var context = await _getClaimContextUseCase
-            .ExecuteAsync(
-                claimId,
-                tenantId);
+        var context = await _claimContextTool
+    .ExecuteAsync(
+        claimId,
+        tenantId);
 
         if (context is null)
             return null;
@@ -72,11 +82,11 @@ public class ClaimAdjudicationOrchestrator
 
         // 2. Retrieve relevant policy evidence using RAG
         var retrievalResults =
-            await _retrieveRelevantChunksUseCase.ExecuteAsync(
-                tenantId,
-                context.Policy.PolicyNumber,
-                context.Claim.IncidentDate,
-                context.Claim.Description);
+     await _policyRetrievalTool.ExecuteAsync(
+         tenantId,
+         context.Policy.PolicyNumber,
+         context.Claim.IncidentDate,
+         context.Claim.Description);
         progress?.Report("Policy evidence retrieved.");
 
         var policyEvidence = string.Join(
@@ -135,10 +145,10 @@ public class ClaimAdjudicationOrchestrator
         else
         {
             approvedAmount =
-                _claimAmountCalculator.CalculateApprovedAmount(
-                    context.Claim.ClaimedAmount,
-                    matchingCoverage.Limit,
-                    matchingCoverage.Deductible);
+    _claimAmountCalculatorTool.Execute(
+        context.Claim.ClaimedAmount,
+        matchingCoverage.Limit,
+        matchingCoverage.Deductible);
 
             decision =
                 approvedAmount == context.Claim.ClaimedAmount
@@ -148,9 +158,9 @@ public class ClaimAdjudicationOrchestrator
 
         // 9. Detect anomalies
         var anomalies =
-            _anomalyDetector.Detect(
-                context.Claim,
-                matchingCoverage);
+    _anomalyDetectionTool.Execute(
+        context.Claim,
+        matchingCoverage);
 
         // 10. Build decision reason
         var reason =
