@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using DomainCopilot.Application.DTOs;
@@ -6,20 +7,22 @@ using DomainCopilot.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-
 namespace DomainCopilot.Application.Auth;
 
 public class LoginUseCase
 {
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
+    private readonly PasswordService _passwordService;
 
     public LoginUseCase(
         IUserRepository userRepository,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        PasswordService passwordService)
     {
         _userRepository = userRepository;
         _configuration = configuration;
+        _passwordService = passwordService;
     }
 
     public async Task<LoginResponseDto?> ExecuteAsync(
@@ -35,8 +38,13 @@ public class LoginUseCase
         if (user is null)
             return null;
 
-        if (user.Password != password)
+        // Verify the password against the stored hash
+        if (!_passwordService.VerifyPassword(
+                user.Password,
+                password))
+        {
             return null;
+        }
 
         var jwtKey = _configuration["Jwt:Key"];
 
@@ -89,3 +97,4 @@ public class LoginUseCase
         };
     }
 }
+

@@ -11,19 +11,19 @@ namespace DomainCopilot.Application.DependencyInjection;
 public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplication(
-    this IServiceCollection services)
+        this IServiceCollection services)
     {
         // Use Cases
         services.AddScoped<GetClaimContextUseCase>();
         services.AddScoped<AdjudicateClaimUseCase>();
         services.AddScoped<ApproveAdjudicationUseCase>();
 
-
-    services.AddScoped<CreateDocumentUseCase>();
+        services.AddScoped<CreateDocumentUseCase>();
         services.AddScoped<ProcessDocumentUseCase>();
         services.AddScoped<GenerateEmbeddingUseCase>();
         services.AddScoped<RetrieveRelevantChunksUseCase>();
         services.AddScoped<LoginUseCase>();
+        services.AddScoped<PasswordService>();
 
         // Agents
         services.AddScoped<CoverageMatcherAgent>();
@@ -49,6 +49,4 @@ public static class ApplicationServiceExtensions
 
         return services;
     }
-
-
 }
