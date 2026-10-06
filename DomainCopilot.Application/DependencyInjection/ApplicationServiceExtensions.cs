@@ -24,6 +24,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<RetrieveRelevantChunksUseCase>();
         services.AddScoped<LoginUseCase>();
         services.AddScoped<PasswordService>();
+        services.AddScoped<GetDashboardSummaryUseCase>();
 
         // Agents
         services.AddScoped<CoverageMatcherAgent>();

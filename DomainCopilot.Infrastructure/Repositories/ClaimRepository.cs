@@ -33,4 +33,13 @@ public class ClaimRepository : IClaimRepository
                 x.ClaimNumber == claimNumber &&
                 x.TenantId == tenantId);
     }
+
+    public async Task<IReadOnlyList<Claim>> GetAllAsync(
+    Guid tenantId)
+    {
+        return await _context.Claims
+            .Where(x => x.TenantId == tenantId)
+            .OrderByDescending(x => x.ClaimId)
+            .ToListAsync();
+    }
 }

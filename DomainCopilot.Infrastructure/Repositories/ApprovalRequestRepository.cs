@@ -64,5 +64,21 @@ public ApprovalRequestRepository(ApplicationDbContext context)
         ).FirstOrDefaultAsync();
     }
 
-
+    public async Task<IReadOnlyList<ApprovalRequest>> GetPendingAsync(
+    Guid tenantId)
+    {
+        return await (
+            from approval in _context.ApprovalRequests
+            join decision in _context.AdjudicationDecisions
+                on approval.AdjudicationDecisionId
+                equals decision.AdjudicationDecisionId
+            join claim in _context.Claims
+                on decision.ClaimId equals claim.ClaimId
+            where claim.TenantId == tenantId
+                  && approval.Status ==
+                     DomainCopilot.Domain.Enums.ApprovalStatus.Pending
+            orderby approval.ApprovalRequestId
+            select approval
+        ).ToListAsync();
+    }
 }

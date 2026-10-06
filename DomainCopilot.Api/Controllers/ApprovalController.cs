@@ -2,6 +2,7 @@
 using DomainCopilot.Application.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using DomainCopilot.Application.Interfaces;
 
 namespace DomainCopilot.Api.Controllers;
 
@@ -12,13 +13,15 @@ public class ApprovalController : ControllerBase
 {
     private readonly ApproveAdjudicationUseCase _approveAdjudicationUseCase;
     private readonly ITenantContext _tenantContext;
+    private readonly IApprovalRequestRepository _approvalRequestRepository;
 
     public ApprovalController(
         ApproveAdjudicationUseCase approveAdjudicationUseCase,
-        ITenantContext tenantContext)
+        ITenantContext tenantContext, IApprovalRequestRepository approvalRequestRepository)
     {
         _approveAdjudicationUseCase = approveAdjudicationUseCase;
         _tenantContext = tenantContext;
+        _approvalRequestRepository = approvalRequestRepository;
     }
 
     [HttpPost("{approvalRequestId:guid}/approve")]
@@ -67,6 +70,15 @@ public class ApprovalController : ControllerBase
         {
             Message = "Adjudication rejected successfully."
         });
+    }
+
+    [HttpGet("pending")]
+    public async Task<IActionResult> GetPending()
+    {
+        var approvals = await _approvalRequestRepository
+            .GetPendingAsync(_tenantContext.TenantId);
+
+        return Ok(approvals);
     }
 }
 

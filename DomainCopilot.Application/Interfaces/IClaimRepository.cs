@@ -11,4 +11,7 @@ public interface IClaimRepository
     Task<Claim?> GetByClaimNumberAsync(
         string claimNumber,
         Guid tenantId);
+
+    Task<IReadOnlyList<Claim>> GetAllAsync(
+        Guid tenantId);
 }
