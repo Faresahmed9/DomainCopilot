@@ -112,10 +112,10 @@ The anomaly does not cause the LLM to override the deterministic financial rule.
 
 Expected:
 
-```text
+text
 Decision: Partially Approved
 Recommended Amount: 7,000
-```
+
 
 Reason:
 
@@ -138,7 +138,7 @@ Expected:
 
 Expected:
 
-```text
+text
 Tenant A → Tenant B = []
 Tenant B → Tenant A = []
 ```
@@ -219,7 +219,7 @@ Tenant and policy-version filters must remain enforced.
 
 # Final Expected Result
 
-```text
+text
 Policy Version: V2
 Coverage: Vehicle Damage
 Limit: 7,000
@@ -228,4 +228,4 @@ Recommended Amount: 7,000
 Decision: Partially Approved
 Human Approval: Required
 Tenant Isolation: Enforced
-```
+
