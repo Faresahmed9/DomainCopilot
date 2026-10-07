@@ -44,7 +44,7 @@ public static class InfrastructureServiceExtensions
         // Adjudication and Approval repositories
         services.AddScoped<IAdjudicationRepository, AdjudicationRepository>();
         services.AddScoped<IApprovalRepository, ApprovalRepository>();
-
+        services.AddScoped<IApprovalRequestRepository, ApprovalRequestRepository>();
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IDocumentStorage, LocalDocumentStorage>();
         services.AddScoped<IDocumentTextExtractor, PdfTextExtractor>();
