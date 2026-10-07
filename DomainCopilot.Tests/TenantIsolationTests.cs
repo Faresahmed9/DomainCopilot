@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DomainCopilot.Tests;
 
+[Trait("Category", "Integration")]
 public class TenantIsolationTests
 {
     [Fact]

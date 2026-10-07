@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 
 namespace DomainCopilot.Tests;
-
+[Trait("Category", "Integration")]
 public class MultiTenantIsolationTests
 {
     private static readonly Guid TenantA =
