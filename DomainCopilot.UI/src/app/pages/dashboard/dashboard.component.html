@@ -1,0 +1,96 @@
+<div class="container-fluid">
+
+  <div class="mb-4">
+    <h2 class="fw-bold">Dashboard</h2>
+
+    <p class="text-muted mb-0">
+      Overview of insurance claims and adjudication activity.
+    </p>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Total Claims -->
+    <div class="col-md-6">
+
+      <div class="card shadow-sm border-0 h-100">
+
+        <div class="card-body p-4">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+              <p class="text-muted mb-2">
+                Total Claims
+              </p>
+
+              <h2 class="fw-bold mb-0">
+                {{ totalClaims }}
+              </h2>
+            </div>
+
+            <div class="fs-1 text-primary">
+              📋
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="col-md-6">
+
+      <div class="card shadow-sm border-0 h-100">
+
+        <div class="card-body p-4">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+              <p class="text-muted mb-2">
+                Pending Approvals
+              </p>
+
+              <h2 class="fw-bold mb-0">
+                {{ pendingApprovals }}
+              </h2>
+            </div>
+
+            <div class="fs-1 text-warning">
+              ⏳
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- System Overview -->
+  <div class="card shadow-sm border-0 mt-4">
+
+    <div class="card-body p-4">
+
+      <h5 class="fw-bold mb-3">
+        Claims Adjudication
+      </h5>
+
+      <p class="text-muted mb-0">
+        Domain Copilot uses AI agents, retrieval-augmented generation,
+        deterministic calculations, and human approval to support
+        insurance claims adjudication.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,68 @@
+<div class="login-page d-flex align-items-center justify-content-center">
+
+  <div class="card shadow-sm border-0 login-card">
+
+    <div class="card-body p-5">
+
+      <div class="text-center mb-4">
+
+        <h2 class="fw-bold">
+          Domain Copilot
+        </h2>
+
+        <p class="text-muted">
+          Insurance Claims Adjudication
+        </p>
+
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="alert alert-danger"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <div class="mb-3">
+
+        <label class="form-label">
+          Username
+        </label>
+
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="username"
+        >
+
+      </div>
+
+      <div class="mb-4">
+
+        <label class="form-label">
+          Password
+        </label>
+
+        <input
+          type="password"
+          class="form-control"
+          [(ngModel)]="password"
+        >
+
+      </div>
+
+      <button
+        class="btn btn-primary w-100"
+        (click)="login()"
+        [disabled]="loading"
+      >
+
+        {{ loading ? 'Signing in...' : 'Login' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

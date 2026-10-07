@@ -1,0 +1,28 @@
+.info-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 20px;
+padding: 14px 0;
+border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+border-bottom: none;
+}
+
+.info-row span {
+color: #6c757d;
+}
+
+.info-row strong {
+text-align: right;
+}
+
+.card {
+border-radius: 12px;
+}
+
+button {
+min-height: 44px;
+}

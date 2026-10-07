@@ -12,6 +12,16 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AngularClient", policy =>
+            {
+                policy
+                    .WithOrigins("http://localhost:4200")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
 
         // Add services to the container.
 
@@ -68,6 +78,7 @@ public class Program
         });
 
         var app = builder.Build();
+        app.UseCors("AngularClient");
 
         // Configure the HTTP request pipeline.
 

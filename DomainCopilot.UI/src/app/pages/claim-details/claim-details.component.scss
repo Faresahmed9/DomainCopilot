@@ -1,0 +1,24 @@
+.analysis-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.analysis-item:last-child {
+  border-bottom: none;
+}
+
+.analysis-item span {
+  color: #6c757d;
+}
+
+.analysis-item strong {
+  text-align: right;
+}
+
+.progress-step {
+  padding: 8px 0;
+  color: #495057;
+}

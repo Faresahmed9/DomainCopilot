@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+aside {
+  min-height: 100vh;
+}
+
+.nav-link {
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+main {
+  min-width: 0;
+}

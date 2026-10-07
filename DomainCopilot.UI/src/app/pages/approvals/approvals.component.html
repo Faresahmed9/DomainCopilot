@@ -1,0 +1,157 @@
+<div>
+
+  <div class="mb-4">
+    <h2 class="fw-bold">Approvals</h2>
+    <p class="text-muted mb-0">
+      Human review and approval gate.
+    </p>
+  </div>
+
+  <div class="row g-4">
+
+
+<!-- Approval Information -->
+<div class="col-lg-7">
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">
+          Pending Approval
+        </h5>
+
+        <span class="badge bg-warning text-dark">
+          Awaiting Review
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span>Decision</span>
+        <strong class="text-warning">
+          Partially Approved
+        </strong>
+      </div>
+
+      <div class="info-row">
+        <span>Claimed Amount</span>
+        <strong>10,000 USD</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Recommended Amount</span>
+        <strong class="text-primary">
+          7,000 USD
+        </strong>
+      </div>
+
+      <div class="info-row">
+        <span>Policy</span>
+        <strong>POL-1001 — V2</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Coverage Limit</span>
+        <strong>7,000 USD</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Deductible</span>
+        <strong>1,000 USD</strong>
+      </div>
+
+      <div class="alert alert-light border mt-4 mb-0">
+        <strong>Human approval required.</strong>
+        <div class="small text-muted mt-1">
+          The AI recommendation must be reviewed and approved
+          by an authorized adjuster before finalization.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Review Action -->
+<div class="col-lg-5">
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+
+      <h5 class="fw-bold mb-4">
+        Review Decision
+      </h5>
+
+      <div class="mb-3">
+        <label class="form-label">
+          Approval Request ID
+        </label>
+
+        <input
+          class="form-control"
+          [(ngModel)]="approvalRequestId"
+          placeholder="Approval request ID"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">
+          Reviewer
+        </label>
+
+        <input
+          class="form-control"
+          [(ngModel)]="reviewerId"
+        >
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">
+          Reviewer Comment
+        </label>
+
+        <textarea
+          class="form-control"
+          [(ngModel)]="comment"
+          rows="4"
+          placeholder="Enter your review comment..."
+        ></textarea>
+      </div>
+
+      <div class="d-grid gap-2">
+
+        <button
+          class="btn btn-success"
+          (click)="approve()"
+          [disabled]="loading"
+        >
+          {{ loading ? 'Processing...' : '✓ Approve Claim' }}
+        </button>
+
+        <button
+          class="btn btn-outline-danger"
+          (click)="reject()"
+          [disabled]="loading"
+        >
+          ✕ Reject Claim
+        </button>
+
+      </div>
+
+      <div
+        *ngIf="message"
+        class="alert alert-info mt-4 mb-0"
+      >
+        {{ message }}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+  </div>
+
+</div>
