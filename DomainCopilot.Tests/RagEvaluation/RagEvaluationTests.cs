@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace DomainCopilot.Tests;
-
+[Trait("Category", "Integration")]
 public class RagEvaluationTests
 {
     [Fact]
@@ -130,7 +130,7 @@ public class RagEvaluationTests
             accuracy >= 70,
             $"RAG retrieval accuracy was only {accuracy:F2}%.");
     }
-    [Trait("Category", "Integration")]
+    
     private static Dictionary<int, GoldenMapping> CreateMappings()
     {
         var tenantA =

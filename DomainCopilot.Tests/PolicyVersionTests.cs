@@ -3,7 +3,7 @@ using DomainCopilot.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DomainCopilot.Tests;
-
+[Trait("Category", "Integration")]
 public class PolicyVersionTests
 {
     [Fact]
