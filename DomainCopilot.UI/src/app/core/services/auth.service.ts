@@ -5,6 +5,7 @@ import { Observable, tap } from 'rxjs';
 export interface LoginRequest {
   username: string;
   password: string;
+  tenantId: string;
 }
 
 export interface LoginResponse {
@@ -23,12 +24,15 @@ export class AuthService {
   login(request: LoginRequest): Observable<LoginResponse> {
 
     const headers = new HttpHeaders({
-      'X-Tenant-Id': 'A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2'
+      'X-Tenant-Id': request.tenantId
     });
 
     return this.http.post<LoginResponse>(
       `${this.apiUrl}/login`,
-      request,
+      {
+        username: request.username,
+        password: request.password
+      },
       { headers }
     ).pipe(
       tap(response => {

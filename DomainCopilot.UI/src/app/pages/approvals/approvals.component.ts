@@ -55,7 +55,7 @@ export class ApprovalsComponent implements OnInit {
     if (!this.approvalRequestId) {
 
       this.message =
-        'Enter an approval request ID first.';
+        'No pending approval request found.';
 
       return;
     }
@@ -96,7 +96,7 @@ export class ApprovalsComponent implements OnInit {
     if (!this.approvalRequestId) {
 
       this.message =
-        'Enter an approval request ID first.';
+        'No pending approval request found.';
 
       return;
     }

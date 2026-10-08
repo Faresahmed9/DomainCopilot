@@ -10,8 +10,10 @@ import {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ CommonModule,
-  FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -19,6 +21,9 @@ export class LoginComponent {
 
   username = 'adjuster.a';
   password = 'Adjuster123!';
+
+  tenantId =
+    'A071EDBD-A4C8-4C53-81BB-9CEF1C72ECB2';
 
   loading = false;
   errorMessage = '';
@@ -35,7 +40,8 @@ export class LoginComponent {
 
     this.authService.login({
       username: this.username,
-      password: this.password
+      password: this.password,
+      tenantId: this.tenantId
     }).subscribe({
 
       next: () => {
